@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { dbConnection } from "./database/connection";
+import authRouter from "./routers/authRouer";
 
 const PORT = process.env.PORT;
 const app = express();
@@ -16,7 +17,7 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
-app.use("/auth", )
+app.use("/auth", authRouter);
 
 app.listen(PORT, () => {
     console.log(`Listening on Port ${PORT}...`);
