@@ -1,28 +1,60 @@
 import { Request, Response } from "express";
 import { io } from "../../app"; 
 import AppResError from "../../types/extensions/app.res.error";
-import IToken from "../../types/models/IToken";
 import { User } from "../../types/schemas/userSchema";
 import { AttackLog } from "../../types/schemas/logSchema";
 import attackDto from "../../types/DTOs/attackDto";
+import getIdFromToken from "../../utils/getId";
+import defenseDto from "../../types/DTOs/defenseDto";
+import { Missile } from "../../types/schemas/missileSchema";
 
-const defend = async (req: Request, res: Response) => {
+const defend = async (req: Request<any, any, defenseDto>, res: Response) => {
     try {
-        const { defenseStrategy, location } = req.body;
+        const { attackId, interceptorType } = req.body;
+        const token = req.header("Authorization");
+        const id = getIdFromToken(token!);
+        const defender = await User.findById(id);
+        if (!defender) throw new AppResError(404, "Log in!");
 
-        const log = AttackLog.findOne()
-        // Logic for creating and saving a defense action could go here
+        const attack = await AttackLog.findById(attackId).populate("attacker", "organization");
+        if (!attack) {
+            throw new AppResError(404, "No Attack found!");
+        }
+        
+        const enemyMissile = await Missile.findOne({ name: attack.missileType });
+        if (!enemyMissile) {
+            throw new AppResError(404, "Missile type not found!");
+        }
 
-        // Emit the defense event to the attacker namespace
-        io.of('/attack').emit("interception_result", 
-            "blahblah"
-        );
+        const timeToImpact = enemyMissile.speed;
+        const elapsedTime = (Date.now() - new Date(attack.timestamp).getTime()) / 1000;
 
-        res.status(200).json({ message: "Defense action taken successfully" });
+        const interceptor = defender.organization.resources.find(w => w.name === interceptorType);
+        if (!interceptor || interceptor.amount <= 0) {
+            throw new AppResError(404, "You do not have this weapon!");
+        }
+
+        let interceptionSuccess = false;
+        if (elapsedTime >= timeToImpact || attack.status !== "pending") { 
+            attack.status = "miss";
+            throw new AppResError(404, "You missed the time window!")
+        } else {
+            interceptionSuccess = Math.random() < 0.7; 
+            attack.status = interceptionSuccess ? "hit" : "miss";
+        }
+        
+        await attack.save();
+
+        io.of('/attack').emit("interception_result", { attackId: attack._id, status: attack.status });
+        interceptor.amount -= 1;
+        await defender.save();
+
+        res.status(200).json({ message: "Defense action taken successfully", status: attack.status });
     } catch (err) {
         res.status(500).json({ message: "Failed to defend" });
         console.error(err);
     }
 };
+
 
 export default defend;

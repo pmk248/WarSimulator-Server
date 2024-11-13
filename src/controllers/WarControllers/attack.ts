@@ -5,7 +5,6 @@ import { User } from "../../types/schemas/userSchema";
 import { AttackLog } from "../../types/schemas/logSchema";
 import attackDto from "../../types/DTOs/attackDto";
 
-// Attack Endpoint
 const attack = async (req: Request<any, any, attackDto>, res: Response) => {
     try {
         const { targetRegion, weaponType, username } = req.body;
@@ -21,8 +20,8 @@ const attack = async (req: Request<any, any, attackDto>, res: Response) => {
             timestamp     : new Date(),
         })
         io.of('/defense').emit("incoming_attack", { attackLog });
-        let inventory = user.organization.resources.find(w => w.name === weaponType);
-        if (!inventory) throw new AppResError(404, "you do not have this weapon!");
+        let inventory = await user.organization.resources.find(w => w.name === weaponType);
+        if (!inventory || inventory.amount <= 0 ) throw new AppResError(404, "you do not have this weapon!");
         inventory.amount -= 1;
         await user.save();
         await attackLog.save();
