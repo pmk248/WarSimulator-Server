@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { io } from "../../app"; 
-import { decodeToken } from "../../middleware/roleMiddleware";
 import AppResError from "../../types/extensions/app.res.error";
 import IToken from "../../types/models/IToken";
 import { User } from "../../types/schemas/userSchema";
@@ -15,12 +14,9 @@ const defend = async (req: Request, res: Response) => {
         // Logic for creating and saving a defense action could go here
 
         // Emit the defense event to the attacker namespace
-        io.of('/attack').emit("interception_result", {
-            defender: req.user.id,
-            defenseStrategy,
-            location,
-            timestamp: new Date(),
-        });
+        io.of('/attack').emit("interception_result", 
+            "blahblah"
+        );
 
         res.status(200).json({ message: "Defense action taken successfully" });
     } catch (err) {

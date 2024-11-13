@@ -1,8 +1,6 @@
 import { Request, Response } from "express";
 import { io } from "../../app"; 
-import { decodeToken } from "../../middleware/roleMiddleware";
 import AppResError from "../../types/extensions/app.res.error";
-import IToken from "../../types/models/IToken";
 import { User } from "../../types/schemas/userSchema";
 import { AttackLog } from "../../types/schemas/logSchema";
 import attackDto from "../../types/DTOs/attackDto";
@@ -14,16 +12,20 @@ const attack = async (req: Request<any, any, attackDto>, res: Response) => {
 
         const user = await User.findOne({ username: username});
         if (!user) throw new AppResError(404, "User not found!")
-
-        const log = new AttackLog({
+        
+        const attackLog = new AttackLog({
             attacker      : user.id,
             targetRegion,
             missileType   : weaponType,
             status        : "pending",  
             timestamp     : new Date(),
         })
-        io.of('/defense').emit("incoming_attack", { log });
-        await log.save();
+        io.of('/defense').emit("incoming_attack", { attackLog });
+        let inventory = user.organization.resources.find(w => w.name === weaponType);
+        if (!inventory) throw new AppResError(404, "you do not have this weapon!");
+        inventory.amount -= 1;
+        await user.save();
+        await attackLog.save();
 
         res.status(200).json({ message: "Attack launched successfully" });
     } catch (err) {

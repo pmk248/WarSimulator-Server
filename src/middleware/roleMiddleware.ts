@@ -1,33 +1,29 @@
-import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
-import IToken from '../types/models/IToken';
 import AppResError from '../types/extensions/app.res.error';
+import getIdFromToken from '../utils/getId';
+import { User } from "../types/schemas/userSchema";
 
-export function decodeToken(token: string): IToken | null {
-  try {
-    return jwt.verify(token, process.env.JWT_SECRET!) as IToken;
-  } catch (error) {
-    return null;
-  }
-}
 
-export function allowIDF(req: Request, res: Response, next: NextFunction) {
-    const token = req.headers.authorization?.split(' ')[1];
-    const user = token ? decodeToken(token) : null;
-  
-    if (!user || user.role !== 'IDF') {
-        throw new AppResError(403,'Access restricted to IDF personnel only');
-    }
-    next();
-}
-  
-export function allowAttacker(req: Request, res: Response, next: NextFunction) {
-    const token = req.headers.authorization?.split(' ')[1];
-    const user = token ? decodeToken(token) : null;
-  
-    if (!user || user.role !== 'Attacker') {
+export async function allowIDF(req: Request, res: Response, next: NextFunction) {
+    const token = req.headers.authorization;
+    if (!token) throw new AppResError(301, "Login!");
+    const id = getIdFromToken(token);
+    const user = await User.findById(id);
+    if (!user) throw new AppResError(404, "can't find user!")
+    if (user.role !== 'IDF') {
         throw new AppResError(403, 'Access restricted to attackers only');
     }
     next();
 }
-  
+
+export async function allowAttacker(req: Request, res: Response, next: NextFunction) {
+    const token = req.headers.authorization;
+    if (!token) throw new AppResError(301, "Login!");
+    const id = getIdFromToken(token);
+    const user = await User.findById(id);
+    if (!user) throw new AppResError(404, "can't find user!")
+    if (user.role !== 'Attacker') {
+        throw new AppResError(403, 'Access restricted to attackers only');
+    }
+    next();
+}

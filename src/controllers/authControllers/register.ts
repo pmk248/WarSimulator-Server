@@ -24,7 +24,11 @@ const register = async (req: Request<any, any, RegisterDTO>, res: Response) => {
             username: req.body.username,
             password: await bcrypt.hash(req.body.password, 5),
             role,
-            organization: organization._id,
+            organization: {
+                name: organization.name,
+                resources: organization.resources,
+                budget: organization.budget,
+            },
             region: role === "IDF" ? req.body.region : undefined
         });
 

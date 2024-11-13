@@ -15,13 +15,23 @@ const userSchema = new Schema<userDocument>({
     },
     role: { 
         type     : String, 
-        enum     : ["IDF", "Attacker"], 
         required : true 
     },
-    organization: { 
-        type     : Schema.Types.ObjectId, 
-        ref      : "Organization",
-        required : true
+    organization: {
+        name: {
+            type     : String,
+            required : true,
+        },
+        resources: [
+            {
+                name  : String,
+                amount: Number,
+            },
+        ],
+        budget: {
+            type    : Number,
+            default : 0,
+        },
     },
     region: { 
         type : String, 
