@@ -3,7 +3,6 @@ import { io } from "../../app";
 import AppResError from "../../types/extensions/app.res.error";
 import { User } from "../../types/schemas/userSchema";
 import { AttackLog } from "../../types/schemas/logSchema";
-import attackDto from "../../types/DTOs/attackDto";
 import getIdFromToken from "../../utils/getId";
 import defenseDto from "../../types/DTOs/defenseDto";
 import { Missile } from "../../types/schemas/missileSchema";
