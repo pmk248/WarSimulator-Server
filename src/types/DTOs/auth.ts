@@ -1,11 +1,13 @@
-export type registerDTO = {
-    username     : string,
-    password     : string,
-    organization : string,
-    region       : string | null
+import { Region, UserRole } from "./enum";
+
+export type RegisterDTO = {
+    username: string;
+    password: string;
+    organization: UserRole;  
+    region?: Region;         
 }
 
-export type loginDTO = {
-    username : string,
-    password : string
+export type LoginDTO = {
+    username: string;
+    password: string;
 }
