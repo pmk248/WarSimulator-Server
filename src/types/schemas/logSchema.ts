@@ -18,7 +18,8 @@ const attackLogSchema = new Schema<logDocument>({
     },
     status: { 
         type     : String, 
-        enum     : ["hit", "miss"], 
+        enum     : ["pending", "hit", "miss"], 
+        default  : "pending",
         required : true 
     },
     interceptionAttempt: {

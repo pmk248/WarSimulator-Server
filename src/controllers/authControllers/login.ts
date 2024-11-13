@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { LoginDTO } from "../../types/DTOs/auth";
 import { User } from "../../types/schemas/userSchema";
+import IToken from "../../types/models/IToken";
 
 const login = async (req: Request<any, any, LoginDTO>, res: Response) => {
     try {

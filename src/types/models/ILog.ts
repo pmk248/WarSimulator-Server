@@ -10,7 +10,7 @@ interface ILog {
     attacker             : Types.ObjectId;
     targetRegion         : "North" | "South" | "Center" | "West Bank";
     missileType          : string;
-    status               : "hit" | "miss";
+    status               : "pending" | "hit" | "miss";
     interceptionAttempt? : IInterceptionAttempt;
     timestamp            : Date;
 }

@@ -14,6 +14,6 @@ export const verifyToken = async (req: Request, res: Response, next: NextFunctio
     } catch(err) {
         const error = err as AppResError;
         res.status(error.statusCode || 500).send(error.message);
-        console.error(error);
     }
 }
+

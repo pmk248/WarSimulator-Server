@@ -1,12 +1,12 @@
 export enum UserRole {
-    IDF = "IDF",
+    IDF      = "IDF",
     Attacker = "Attacker"
 }
 
 
 export enum Region {
-    North = "North",
-    South = "South",
-    Center = "Center",
+    North    = "North",
+    South    = "South",
+    Center   = "Center",
     WestBank = "West Bank"
 }
