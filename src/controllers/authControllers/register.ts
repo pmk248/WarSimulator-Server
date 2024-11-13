@@ -8,7 +8,11 @@ import { Organization } from "../../types/schemas/organizationSchema";
 const register = async (req: Request<any, any, RegisterDTO>, res: Response) => {
     try {
         // Finding Organization:
-        const organization = await Organization.findOne({ name: req.body.organization });
+        let orgName = "";
+        req.body.organization !== "IDF" 
+            ? orgName = req.body.organization : orgName = `${req.body.organization} - ${req.body.region}`;
+        
+        const organization = await Organization.findOne({ name: orgName });
         if (!organization) {
             throw new AppResError(404, `${req.body.organization} doesn't exist!`);
         }

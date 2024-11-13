@@ -1,4 +1,4 @@
-import { Region, UserRole } from "./enum";
+import { Region, UserRole } from "../enum";
 
 export type RegisterDTO = {
     username     : string;
