@@ -1,9 +1,8 @@
 import { Region } from "../enum";
 
 type attackDto = {
-    username     : string,
     targetRegion : Region,
-    weaponType   : string
+    missileType  : string
 }
 
 export default attackDto;
