@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { AttackLog } from '../../types/schemas/logSchema';
+import { Missile } from '../../types/schemas/missileSchema'; 
 import { User } from '../../types/schemas/userSchema';
 import AppResError from '../../types/extensions/app.res.error';
 import getIdFromToken from '../../utils/getId';
@@ -13,32 +14,42 @@ const getLogs = async (req: Request, res: Response) => {
         const user = await User.findById(userId);
         if (!user) throw new AppResError(404, 'User not found');
         
-        let logs: Array<AttackLog | undefined> = [];
+        let logs = [];
 
         if (["Hezbollah", "Hamas", "IRGC", "Houthis"].includes(user.organization.name)) {
-            // Fetch logs where the user was the attacker
-            logs = await AttackLog.find({ attacker: userId });
+            logs = await AttackLog.find({ attacker: userId }).exec();
 
-            // Send proper JSON response
-            res.status(200).json(logs.map(log => ({
-                id: log._id,
-                missileType: log.missileType,
-                targetRegion: log.targetRegion,
-                status: log.status,
-                timeToImpact: log.timeToImpact
-            })));
+            const logsWithSpeed = await Promise.all(logs.map(async (log) => {
+                const missile = await Missile.findOne({ name: log.missileType }).exec();
+                const timeToImpact = missile ? missile.speed : 0;  
+
+                return {
+                    id: log._id,
+                    missileType: log.missileType,
+                    targetRegion: log.targetRegion,
+                    status: log.status,
+                    timeToImpact,
+                };
+            }));
+
+            res.status(200).json(logsWithSpeed);
         } else if (user.role === 'IDF') {
-            // Fetch logs where the user was the defender
-            logs = await AttackLog.find({ targetRegion: user.region });
+            logs = await AttackLog.find({ targetRegion: user.region }).exec();
 
-            // Send proper JSON response
-            res.status(200).json(logs.map(log => ({
-                id: log._id,
-                missileType: log.missileType,
-                targetRegion: log.targetRegion,
-                status: log.status,
-                timeToImpact: log.timeToImpact
-            })));
+            const logsWithSpeed = await Promise.all(logs.map(async (log) => {
+                const missile = await Missile.findOne({ name: log.missileType }).exec();
+                const timeToImpact = missile ? missile.speed : 0;  
+
+                return {
+                    id: log._id,
+                    missileType: log.missileType,
+                    targetRegion: log.targetRegion,
+                    status: log.status,
+                    timeToImpact,  
+                };
+            }));
+
+            res.status(200).json(logsWithSpeed);
         } else {
             throw new AppResError(400, 'Invalid user role');
         }
