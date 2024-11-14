@@ -1,9 +1,9 @@
-import { Types } from "mongoose"
+import { UserRole } from "../enum";
 
 interface IUser {
     username     : string,
     password     : string,
-    role         : string, 
+    role         : UserRole, 
     organization : {
         name     : string,
         resources: { name: string; amount: number }[],

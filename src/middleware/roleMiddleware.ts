@@ -22,7 +22,7 @@ export async function allowAttacker(req: Request, res: Response, next: NextFunct
     const id = getIdFromToken(token);
     const user = await User.findById(id);
     if (!user) throw new AppResError(404, "can't find user!")
-    if (user.role !== 'Attacker') {
+    if (!["Hezbollah", "Hamas", "IRGC", "Houthis"].includes(user.organization.name)) {
         throw new AppResError(403, 'Access restricted to attackers only');
     }
     next();

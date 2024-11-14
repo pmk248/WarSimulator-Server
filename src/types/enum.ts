@@ -1,6 +1,9 @@
 export enum UserRole {
-    IDF      = "IDF",
-    Attacker = "Attacker"
+    IDF       = "IDF",
+    Hezbollah = "Hezbollah",
+    Hamas     = "Hamas",
+    IRGC      = "IRGC",
+    Houthis   = "Houthis"
 }
 
 
