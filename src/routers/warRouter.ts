@@ -3,10 +3,13 @@ import attack from "../controllers/WarControllers/attack";
 import { verifyToken } from "../middleware/verifyToken";
 import { allowAttacker, allowIDF } from "../middleware/roleMiddleware"
 import getLogs from "../controllers/WarControllers/getLogs";
+import defend from "../controllers/WarControllers/defend";
 
-const attackRouter = Router();
+const warRouter = Router();
 
-attackRouter.post("/attack", verifyToken, allowAttacker, attack);
-attackRouter.get("/logs", verifyToken, getLogs);
+warRouter.post("/attack", verifyToken, allowAttacker, attack);
+warRouter.post("/defend", verifyToken, allowIDF, defend);
 
-export default attackRouter;
+warRouter.get("/logs", verifyToken, getLogs);
+
+export default warRouter;
